@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
-// use Intervention\Image\Facades\Image;
-use Image;
+use Intervention\Image\Facades\Image;
+//use Image;
 // use Intervention\Image\ImageServiceProvider;
 class ProductController extends Controller
 {
@@ -37,6 +37,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        
         $this->validate($request, [
             'name'=> 'required',
             'category_id' => 'required',
@@ -47,7 +48,7 @@ class ProductController extends Controller
             'purchase_type_id' => 'required',
         ]);
 
-        $image = $request->file('image');
+        $image = $request->input('image');
         if(isset($image)){
             $id = Product::count();
             if($id > 0){ 
@@ -61,9 +62,9 @@ class ProductController extends Controller
             $imageName = $request->input('name').'-'.$id.'.webp';
             $height = 800;
             $width = 800;
-            $path = '/images/uploads/products/';
-            $image-> move(public_path('public/Images/uploads/products/'), $imageName);
-            // Image::make($image)->fit($width, $height)->save(public_path($path) . $imageName, 50, 'webp');
+            $path = 'public/images/uploads/products/';
+            // $image-> move(public_path('public/Images/uploads/products/'), $imageName);
+            Image::make($image)->fit($width, $height)->save(public_path($path) . $imageName, 50, 'webp');
         }
 
         $data = [

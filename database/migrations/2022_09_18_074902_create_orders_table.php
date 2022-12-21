@@ -26,6 +26,7 @@ return new class extends Migration
             $table->float('weight',9,2)->nullable();
             $table->string('area');
             $table->unsignedBigInteger('delivery_media_id')->nullable();
+            $table->tinyInteger('status')->nullable();
             $table->foreign('product_id')->references('id')->on('products');
             //$table->foreign('customer_id')->references('id')->on('customers');
             $table->foreign('delivery_media_id')->references('id')->on('delivery_media');
