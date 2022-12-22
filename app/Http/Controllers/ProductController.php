@@ -40,6 +40,7 @@ class ProductController extends Controller
         
         $this->validate($request, [
             'name'=> 'required',
+            'product_code' =>'required|unique:products,product_code',
             'category_id' => 'required',
             'quantity' => 'required',
             'price' => 'required',
@@ -59,7 +60,7 @@ class ProductController extends Controller
                 $id = 1;
             }
 
-            $imageName = $request->input('name').'-'.$id.'.webp';
+            $imageName = $request->input('name').'-'.$request->input('product_code').'.webp';
             $height = 800;
             $width = 800;
             $path = 'public/images/uploads/products/';
@@ -69,6 +70,7 @@ class ProductController extends Controller
 
         $data = [
             'name'=> $request->input('name'),
+            'product_code'=> $request->input('product_code'),
             'category_id' => $request->input('category_id'),
             'quantity' => $request->input('quantity'),
             'price'=> $request->input('price'),

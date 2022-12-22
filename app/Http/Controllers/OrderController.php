@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\OrderResource;
 use Intervention\Image\Facades\Image;
 use App\Models\Order;
 use App\Models\Product;
@@ -40,7 +41,7 @@ class OrderController extends Controller
         // return $request->all();
 
         $this->validate($request, [
-            'product_id' => 'required',
+            'product_code' => 'required',
             'customer_name' => 'required',
             'address' => 'required',
             'phone' => 'required',
@@ -52,6 +53,8 @@ class OrderController extends Controller
             'area' => 'required',
             'delivery_media_id' => 'required',
         ]);
+
+        $productID = Product::where('product_code', $request->input('product_code'))->value('id');
 
         $image = $request->input('image');
         if (isset($image)) {
@@ -88,11 +91,12 @@ class OrderController extends Controller
         $data = $request->all();
         $data['image'] = $imageName;
         $data['status'] = 0;
+        $data['product_id'] = $productID;
 
         // $isProduct = Product::findOrFail($request->input('product_id'))->count();
-
-        if (Product::where('id', $request->input('product_id'))->count() > 0) {
-            $productQuantity = Product::where('id', $request->input('product_id'))->value('quantity');
+            // return $data;
+        if (Product::where('product_code', $request->input('product_code'))->count() > 0) {
+            $productQuantity = Product::where('product_code', $request->input('product_code'))->value('quantity');
             if ($productQuantity >= $request->input('quantity')) {
                 Order::create($data);
                 return response()->json(['msg' => 'Order Created Successfully']);
@@ -147,5 +151,11 @@ class OrderController extends Controller
     public function destroy(Order $order)
     {
         //
+    }
+
+    public function invoice()
+    {
+        $orders = Order::where('status', 0)->get();
+        return OrderResource::collection($orders);
     }
 }

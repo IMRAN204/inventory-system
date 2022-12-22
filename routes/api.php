@@ -42,3 +42,5 @@ Route::resource('delivery-media', DeliveryMediaController::class);
 Route::resource('customer', CustomerController::class);
 Route::resource('order', OrderController::class);
 Route::resource('product', ProductController::class);
+
+Route::get('invoice', [OrderController::class, 'invoice']);
