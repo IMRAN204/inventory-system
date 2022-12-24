@@ -98,6 +98,8 @@ class OrderController extends Controller
         if (Product::where('product_code', $request->input('product_code'))->count() > 0) {
             $productQuantity = Product::where('product_code', $request->input('product_code'))->value('quantity');
             if ($productQuantity >= $request->input('quantity')) {
+                $restQuantity['quantity'] = $productQuantity - $request->input('quantity');
+                Product::where('id', $productID)->update($restQuantity);
                 Order::create($data);
                 return response()->json(['msg' => 'Order Created Successfully']);
             } else {
@@ -139,7 +141,10 @@ class OrderController extends Controller
      */
     public function update(Request $request, Order $order)
     {
-        //
+        // return $order;
+        $data['status'] = 1;
+        $order->update($data);
+        return response()->json(['msg' => 'order status updated']);
     }
 
     /**
@@ -150,7 +155,8 @@ class OrderController extends Controller
      */
     public function destroy(Order $order)
     {
-        //
+        $order->delete();
+        return response()->json(['msg' => 'order deleted successfully']);
     }
 
     public function invoice()

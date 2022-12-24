@@ -14,7 +14,7 @@ class InvestmentController extends Controller
      */
     public function index()
     {
-        return Investment::all();
+        return Investment::sum('amount');
     }
 
     /**

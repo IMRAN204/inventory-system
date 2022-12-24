@@ -37,7 +37,11 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        
+        // return $request->all();
+        // if(Product::where('product_code', $request->input('product_code')))
+        // {
+        //     return response()->json(['msg'=> 'product is already available']);
+        // }
         $this->validate($request, [
             'name'=> 'required',
             'product_code' =>'required|unique:products,product_code',
@@ -117,7 +121,7 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        //
+        // 
     }
 
     /**

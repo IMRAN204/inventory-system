@@ -44,3 +44,4 @@ Route::resource('order', OrderController::class);
 Route::resource('product', ProductController::class);
 
 Route::get('invoice', [OrderController::class, 'invoice']);
+// Route::get('', [OrderController::class, 'invoice']);
