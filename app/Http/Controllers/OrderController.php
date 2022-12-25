@@ -141,8 +141,8 @@ class OrderController extends Controller
      */
     public function update(Request $request, Order $order)
     {
-        // return $order;
-        $data['status'] = 1;
+        // return $order->status;
+        $data['status'] = $order->status + 1;
         $order->update($data);
         return response()->json(['msg' => 'order status updated']);
     }
@@ -155,13 +155,59 @@ class OrderController extends Controller
      */
     public function destroy(Order $order)
     {
+        $productQuantity = Product::where('id', $order->product_id)->value('quantity');
+        $data['quantity'] = $order->quantity + $productQuantity;
+        Product::where('id', $order->product_id)->update($data);
         $order->delete();
         return response()->json(['msg' => 'order deleted successfully']);
     }
 
     public function invoice()
     {
-        $orders = Order::where('status', 0)->get();
+        $orders = Order::all();
         return OrderResource::collection($orders);
+    }
+
+    public function chalan($id)
+    {
+        $deliveredProduct = Order::where('product_code', '=', $id)->where('status', 2)->sum('quantity');
+        $pendingProduct = Order::where('product_code', '=', $id)->where('status', 0)->sum('quantity');
+        $shippingProduct = Order::where('product_code', '=', $id)->where('status', 1)->sum('quantity');
+        $restProduct = Product::where('product_code', $id)->value('quantity');
+        $purchasingPrice = Product::where('product_code', $id)->value('price');
+        $soldPrice = Order::where('product_code', '=', $id)->where('status', 2)->sum('price');
+        $discountPrice = Order::where('product_code', '=', $id)->where('status', 2)->sum('discount');
+        $imagePath = 'public/images/uploads/products/';
+        $imageName = Product::where('product_code', $id)->value('image');
+        $productName = Product::where('product_code', $id)->value('name');
+        $data = [
+            'productName' => $productName,
+            'productCode' => $id,
+            'perProductPrice' => round(($purchasingPrice / ($deliveredProduct + $shippingProduct + $pendingProduct +$restProduct)),2),
+            'purchasingPrice' => $purchasingPrice,
+            'totalQuantity' => $deliveredProduct + $shippingProduct + $pendingProduct +$restProduct,
+            'soldQuantity' => $deliveredProduct,
+            'restQuantity' => $restProduct,
+            'soldPrice' => $soldPrice-$discountPrice,
+            'chalan' => $purchasingPrice-($soldPrice-$discountPrice),
+            'image' => url($imagePath . $imageName),
+            'deliveredProduct' => $deliveredProduct,
+            'pendingProduct' => $pendingProduct,
+            'shippingProduct' => $shippingProduct,
+            'discount' => $discountPrice,
+        ];
+
+        return $data;
+            
+    }
+
+    public function orderReturn($id)
+    {
+        $order = Order::where('id', $id)->first();
+        $productQuantity = Product::where('id', $order->product_id)->value('quantity');
+        $data['quantity'] = $order->quantity + $productQuantity;
+        Product::where('id', $order->product_id)->update($data);
+        $order->update(['status' => 3]);
+        return response()->json(['msg' => 'order returned successfully']);
     }
 }

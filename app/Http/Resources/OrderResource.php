@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Models\DeliveryMedia;
+use App\Models\Order;
 use Faker\Core\File;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -16,6 +17,7 @@ class OrderResource extends JsonResource
      */
     public function toArray($request)
     {
+        // $date = Order::where('product_code', '=', $this->id)->value('created_at');
         $path = 'public/images/uploads/orders/';
         $delivery = DeliveryMedia::where('id', $this->delivery_media_id)->value('name');
         return [
@@ -32,6 +34,8 @@ class OrderResource extends JsonResource
             "area" => $this->area,
             "delivery_media_id" => $delivery,
             "status" => $this->status,
+            'date' => $this->created_at->format('d-m-Y'),
+
         ];
     }
 }

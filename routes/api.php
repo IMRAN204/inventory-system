@@ -44,4 +44,5 @@ Route::resource('order', OrderController::class);
 Route::resource('product', ProductController::class);
 
 Route::get('invoice', [OrderController::class, 'invoice']);
-// Route::get('', [OrderController::class, 'invoice']);
+Route::get('chalan/{id}', [OrderController::class, 'chalan']);
+Route::put('order-return/{id}', [OrderController::class, 'orderReturn']);
