@@ -14,7 +14,7 @@ class ExpenseTypeController extends Controller
      */
     public function index()
     {
-        return ExpenseType::all();
+        return ExpenseType::latest()->get();
     }
 
     /**

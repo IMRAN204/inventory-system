@@ -164,7 +164,7 @@ class OrderController extends Controller
 
     public function invoice()
     {
-        $orders = Order::all();
+        $orders = Order::latest()->get();
         return OrderResource::collection($orders);
     }
 

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DeliveryMediaController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ExpenseTypeController;
@@ -46,3 +47,5 @@ Route::resource('product', ProductController::class);
 Route::get('invoice', [OrderController::class, 'invoice']);
 Route::get('chalan/{id}', [OrderController::class, 'chalan']);
 Route::put('order-return/{id}', [OrderController::class, 'orderReturn']);
+
+Route::get('dashboard',  [DashboardController::class, 'index']);
