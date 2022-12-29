@@ -19,7 +19,7 @@ class DashboardController extends Controller
         $productOnHandQuantity = Product::sum('quantity');
         $productOnHandAmount = Product::sum('price');
         $totalDelivered = Order::where('status', 2)->count();
-        $totalDeliveredAmount = Order::where('status', 2)->sum('price');
+        $totalDeliveredAmount = Order::where('status', 2)->sum('price') - Order::where('status', 2)->sum('discount');
         $totalReturn = Order::where('status', 3)->count();
         $totalReturnAmount = Order::where('status', 3)->sum('price');
         $totalShipping = Order::where('status', 1)->count();
@@ -61,12 +61,16 @@ class DashboardController extends Controller
 
         $investedWithoutLoanLiquid = Investment::whereNot('name', 'loan')->sum('amount');
         $investedLoanLiquid = Investment::where('name', 'loan')->sum('amount');
-        $opening = $productOnHandAmount + $investedWithoutLoanLiquid - $investedLoanLiquid;
 
+        $opening = $investedWithoutLoanLiquid - $investedLoanLiquid;
+
+        $withDrawId = ExpenseType::where('name', 'withdraw')->value('id');
+        $withDraw = Expense::where('expense_type_id', $withDrawId)->sum('amount');
         $closing = $cashLiquid + $paid + $productOnHandAmount + $advancePayment - $accountsPayable;
 
-        $profit = $closing - $opening;
+        $profit = $closing + $withDraw - $opening;
 
+        $date = Investment::get()->first()->value('created_at')->format('Y-m-d');
         
         return $data = [
             'totalInvestment' => $totalInvestment,
