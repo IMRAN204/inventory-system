@@ -17,7 +17,21 @@ class DashboardController extends Controller
         $totalInvestment = Investment::sum('amount');
 
         $productOnHandQuantity = Product::sum('quantity');
-        $productOnHandAmount = Product::sum('price');
+        $productOnHandAmount = 0;
+        $codes = Product::where('id', '>', 0)->pluck('product_code')->toArray();
+        for ($i = 0; $i < count($codes); $i++) {
+            $deliveredProduct = Order::where('product_code', '=', $codes[$i])->where('status', 2)->sum('quantity');
+            $pendingProduct = Order::where('product_code', '=', $codes[$i])->where('status', 0)->sum('quantity');
+            $shippingProduct = Order::where('product_code', '=', $codes[$i])->where('status', 1)->sum('quantity');
+            $restProduct = Product::where('product_code', $codes[$i])->value('quantity');
+            $purchasingPrice = Product::where('product_code', $codes[$i])->value('price');
+            $perProductPrice = round(($purchasingPrice / ($deliveredProduct + $shippingProduct + $pendingProduct +$restProduct)),2);
+            $restProductPrice = $restProduct * $perProductPrice;
+
+            $productOnHandAmount = $productOnHandAmount + $restProductPrice;
+
+        }
+        $productOnHandAmount = 0;
         $totalDelivered = Order::where('status', 2)->count();
         $totalDeliveredAmount = Order::where('status', 2)->sum('price') - Order::where('status', 2)->sum('discount');
         $totalReturn = Order::where('status', 3)->count();
@@ -37,7 +51,7 @@ class DashboardController extends Controller
         $creditPaid = ExpenseType::where('name', 'credit paid')->value('id');
         $loanPaid = ExpenseType::where('name', 'loan paid')->value('id');
         $paid = Expense::where('expense_type_id', $creditPaid)->orWhere('expense_type_id', $loanPaid)->sum('amount');
-        $accountsPayable = $productOnCredit + $expenseCredit + $loan - $paid;
+        return $accountsPayable = $productOnCredit + $expenseCredit + $loan - $paid;
 
         $purchaseAdvance = PurchaseType::where('name', 'advance')->value('id');
         $productOnAdvance = Product::where('purchase_type_id', $purchaseAdvance)->sum('price');
@@ -55,7 +69,7 @@ class DashboardController extends Controller
         $expenseTypeAdvanceReduce = ExpenseType::where('name', 'advance reduce')->value('id');
         $expenseNotCredit = Expense::whereNot('expense_type_id', $expenseTypeCredit)->whereNot('expense_type_id', $expenseTypeAdvanceReduce)->whereNot('expense_type_id', $expenseTypeAdvanceReturn)->sum('amount');
         $productNotCredit = Product::whereNot('purchase_type_id', $purchaseCredit)->sum('price');
-        
+
         $cashLiquid = $investedLiquid + $totalDeliveredAmount + $expenseAdvanceReturn - $expenseNotCredit - $productNotCredit;
         $totalPurchase = Product::sum('price');
 
@@ -71,7 +85,7 @@ class DashboardController extends Controller
         $profit = $closing + $withDraw - $opening;
 
         $date = Investment::get()->first()->value('created_at')->format('Y-m-d');
-        
+
         return $data = [
             'totalInvestment' => $totalInvestment,
             'productOnHandQuantity' => $productOnHandQuantity,
