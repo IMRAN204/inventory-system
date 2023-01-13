@@ -37,11 +37,6 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        // return $request->all();
-        // if(Product::where('product_code', $request->input('product_code')))
-        // {
-        //     return response()->json(['msg'=> 'product is already available']);
-        // }
         $this->validate($request, [
             'name'=> 'required',
             'product_code' =>'required|unique:products,product_code',
@@ -68,7 +63,6 @@ class ProductController extends Controller
             $height = 800;
             $width = 800;
             $path = 'public/images/uploads/products/';
-            // $image-> move(public_path('public/Images/uploads/products/'), $imageName);
             Image::make($image)->fit($width, $height)->save(public_path($path) . $imageName, 50, 'webp');
         }
 
