@@ -9,15 +9,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class OrderResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
-     */
+    
     public function toArray($request)
     {
-        // $date = Order::where('product_code', '=', $this->id)->value('created_at');
         $path = 'public/images/uploads/orders/';
         $delivery = DeliveryMedia::where('id', $this->delivery_media_id)->value('name');
         return [
